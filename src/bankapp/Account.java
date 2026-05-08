@@ -13,8 +13,7 @@ public class Account {
 	void deposit(double amount) {
 		if(amount > 0) {
 			balance += amount;
-			String msg = "Deposited : "+amount;
-			transactions.add(msg);
+			transactions.add("DEPOSIT +"+amount+" | Balance : "+balance);
 			System.out.println("Deposit Successful!");
 			System.out.println("Current Balance : "+balance);
 		}
@@ -26,8 +25,7 @@ public class Account {
 	boolean withdraw(double amount) {
 		if(amount>0 && amount<=balance) {
 			balance -= amount;
-			String msg="Withdrawn : "+amount;
-			transactions.add(msg);
+			transactions.add("WITHDRAW -"+amount+" | Balance : "+balance);
 			System.out.println("Withdrawal Successful!");
 			System.out.println("Current Balance : "+balance);
 			return true;
@@ -48,8 +46,10 @@ public class Account {
 			System.out.println("No Transactions Yet. Transactions You Make Will Appear Here.");
 		}
 		else {
+			int i=1;
 			for(String t : transactions) {
-				System.out.println(t);
+				System.out.println(i+". "+t);
+				i++;
 			}
 		}
 	}

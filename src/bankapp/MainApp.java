@@ -40,69 +40,78 @@ public class MainApp {
 				break;
 
 			case 2:
-				System.out.println();
-				System.out.println("*********LOGIN*********");
-				System.out.println();
-				System.out.print("Enter Name : ");
-				String name=sc.next();
-				System.out.print("Enter MPIN : ");
-				String mpin=sc.next();
-				
-				Account loggedInUser = null;
-				for(Account a:accounts) {
-					if(a.name.equals(name)&&a.mpin.equals(mpin)) {
-						loggedInUser=a;
-						break;
+				int attempts = 0;
+				boolean loggedIn = false;
+				while(attempts < 3 && !loggedIn) {
+					System.out.println();
+					System.out.println("*********LOGIN*********");
+					System.out.println();
+					System.out.print("Enter Name : ");
+					String name=sc.next();
+					System.out.print("Enter MPIN : ");
+					String mpin=sc.next();
+					
+					Account loggedInUser = null;
+					for(Account a:accounts) {
+						if(a.name.equals(name)&&a.mpin.equals(mpin)) {
+							loggedInUser=a;
+							break;
+						}
+					}
+					
+					if(loggedInUser!=null) {
+						loggedIn = true;
+						int userChoice;
+						
+						do {
+							System.out.println();
+							System.out.println("*********USER MENU*********");
+							System.out.println("1. Check Balance");
+							System.out.println("2. Deposit");
+							System.out.println("3. Withdraw");
+							System.out.println("4. View Transactions");
+							System.out.println("5. Logout");
+							System.out.println();
+							System.out.print("Enter Choice : ");
+							userChoice = sc.nextInt();
+							System.out.println();
+							switch(userChoice) {
+							case 1:
+								loggedInUser.showBalance();
+								break;
+								
+							case 2:
+								System.out.print("Enter Amount To Deposit : ");
+								double amount=sc.nextDouble();
+								loggedInUser.deposit(amount);
+								break;
+								
+							case 3:
+								System.out.print("Enter Amount To Withdraw : ");
+								double withdrawAmount=sc.nextDouble();
+								loggedInUser.withdraw(withdrawAmount);
+								break;
+								
+							case 4:
+								loggedInUser.showTransactions();
+								break;
+								
+							case 5:
+								System.out.println("Logging Out...");
+								System.out.println("Logged Out Successfully!");
+								break;
+							default:
+								System.out.println("Invalid Choice! Please Choose A Valid Number.");
+							}
+						} while(userChoice != 5);
+					}
+					else {
+						attempts++;
+						System.out.println("The Credentials Are Invalid! You Have "+(3-attempts)+" Attempts Left.");
 					}
 				}
-				
-				if(loggedInUser!=null) {
-					int userChoice;
-					
-					do {
-						System.out.println();
-						System.out.println("*********USER MENU*********");
-						System.out.println("1. Check Balance");
-						System.out.println("2. Deposit");
-						System.out.println("3. Withdraw");
-						System.out.println("4. View Transactions");
-						System.out.println("5. Logout");
-						System.out.println();
-						System.out.print("Enter Choice : ");
-						userChoice = sc.nextInt();
-						System.out.println();
-						switch(userChoice) {
-						case 1:
-							loggedInUser.showBalance();
-							break;
-							
-						case 2:
-							System.out.print("Enter Amount To Deposit : ");
-							double amount=sc.nextDouble();
-							loggedInUser.deposit(amount);
-							break;
-							
-						case 3:
-							System.out.print("Enter Amount To Withdraw : ");
-							double withdrawAmount=sc.nextDouble();
-							loggedInUser.withdraw(withdrawAmount);
-							break;
-							
-						case 4:
-							loggedInUser.showTransactions();
-							break;
-							
-						case 5:
-							System.out.println("Logging Out...");
-							System.out.println("Logged Out Successfully!");
-							break;
-						default:
-							System.out.println("Invalid Choice! Please Choose A Valid Number.");
-						}
-					} while(userChoice != 5);
-				}
-				else {
-					System.out.println("The Credentials Are Invalid!");
+				if(!loggedIn) {
+					System.out.println("Access To The Account Has Been Temporarily Blocked Due To Multiple Failed Login Attempts. Please Try Again Later!");
 				}
 				
 				break;
