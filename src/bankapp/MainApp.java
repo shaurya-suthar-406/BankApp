@@ -29,7 +29,7 @@ public class MainApp {
 				Account acc=new Account();
 				System.out.print("Enter Your Name : ");
 				acc.name=sc.next();
-				System.out.print("Enter MPIN : ");
+				System.out.print("Set MPIN : ");
 				acc.mpin=sc.next();
 				System.out.print("Enter Initial Balance : ");
 				acc.balance=sc.nextDouble();
@@ -61,54 +61,48 @@ public class MainApp {
 					
 					do {
 						System.out.println();
-						System.out.println("*********User Menu*********");
+						System.out.println("*********USER MENU*********");
 						System.out.println("1. Check Balance");
 						System.out.println("2. Deposit");
 						System.out.println("3. Withdraw");
-						System.out.println("4. Logout");
+						System.out.println("4. View Transactions");
+						System.out.println("5. Logout");
 						System.out.println();
 						System.out.print("Enter Choice : ");
 						userChoice = sc.nextInt();
 						System.out.println();
 						switch(userChoice) {
 						case 1:
-							System.out.println("Balance : "+loggedInUser.balance);
+							loggedInUser.showBalance();
 							break;
 							
 						case 2:
 							System.out.print("Enter Amount To Deposit : ");
 							double amount=sc.nextDouble();
-							loggedInUser.balance+=amount;
-							System.out.println("Amount Deposited Successfully!");
+							loggedInUser.deposit(amount);
 							break;
 							
 						case 3:
 							System.out.print("Enter Amount To Withdraw : ");
 							double withdrawAmount=sc.nextDouble();
-							if(withdrawAmount<=loggedInUser.balance) {
-								loggedInUser.balance-=withdrawAmount;
-								System.out.println();
-								System.out.println("Withdrawal Successful!");
-								System.out.println();
-							}
-							else {
-								System.out.println();
-								System.out.println("Insufficient Balance!");
-								System.out.println();
-							}
+							loggedInUser.withdraw(withdrawAmount);
 							break;
 							
 						case 4:
+							loggedInUser.showTransactions();
+							break;
+							
+						case 5:
 							System.out.println("Logging Out...");
 							System.out.println("Logged Out Successfully!");
 							break;
 						default:
-							System.out.println("Invalid Choice!");
+							System.out.println("Invalid Choice! Please Choose A Valid Number.");
 						}
-					} while(userChoice != 4);
+					} while(userChoice != 5);
 				}
 				else {
-					System.out.println("Invalid Credentials!");
+					System.out.println("The Credentials Are Invalid!");
 				}
 				
 				break;
@@ -116,10 +110,11 @@ public class MainApp {
 			case 3:
 				System.out.println("Exiting...");
 				System.out.println("* Thank You For Using Our Services *");
+				System.out.println("\nHave A Nice Day :)");
 				break;
 				
 			default:
-				System.out.println("Invalid Choice!");
+				System.out.println("Invalid Choice! Please Choose A Valid Number.");
 				break;
 			}
 		} while(choice!=3);
