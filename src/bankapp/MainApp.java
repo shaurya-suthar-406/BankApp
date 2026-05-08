@@ -11,7 +11,7 @@ public class MainApp {
 		Scanner sc=new Scanner(System.in);
 		int choice;
 		
-		System.out.println("*****************BANK APP******************");
+		System.out.println("--------------- BANK APP ---------------");
 		do {
 			System.out.println();
 			System.out.println("1. Signup");
@@ -24,7 +24,7 @@ public class MainApp {
 			switch(choice) {
 			case 1:
 				System.out.println();
-				System.out.println("**********SIGNUP***********");
+				System.out.println("---------- SIGNUP ----------");
 				System.out.println();
 				Account acc=new Account();
 				System.out.print("Enter Your Name : ");
@@ -44,7 +44,7 @@ public class MainApp {
 				boolean loggedIn = false;
 				while(attempts < 3 && !loggedIn) {
 					System.out.println();
-					System.out.println("*********LOGIN*********");
+					System.out.println("---------- LOGIN ----------");
 					System.out.println();
 					System.out.print("Enter Name : ");
 					String name=sc.next();
@@ -65,7 +65,7 @@ public class MainApp {
 						
 						do {
 							System.out.println();
-							System.out.println("*********USER MENU*********");
+							System.out.println("---------- USER MENU ----------");
 							System.out.println("1. Check Balance");
 							System.out.println("2. Deposit");
 							System.out.println("3. Withdraw");
