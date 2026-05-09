@@ -7,6 +7,8 @@ public class Account {
 	String name;
 	String mpin;
 	double balance;
+	int accountNumber;
+	static int nextAccountNumber=1001;
 	
 	ArrayList<String> transactions = new ArrayList<>();
 	
@@ -51,6 +53,22 @@ public class Account {
 				System.out.println(i+". "+t);
 				i++;
 			}
+		}
+	}
+	
+	void transfer(Account receiver, double amount) {
+		if(amount>0 && amount<=balance) {
+			balance -= amount;
+			receiver.balance += amount;
+			transactions.add("TRANSFERRED -"+amount+" TO A/C "+receiver.accountNumber+" | Balance : "+balance);
+			receiver.transactions.add("RECEIVED +"+amount+" FROM A/C "+accountNumber+" | Balance : "+receiver.balance);
+			System.out.println("Transfer Successful!");
+			System.out.println("\nTransferred Amount : "+amount);
+			System.out.println("Receiver Name : "+receiver.name);
+			System.out.println("\nCurrent Balance : "+balance);
+		}
+		else {
+			System.out.println("\nInsufficient Balance Or Invalid Amount!");
 		}
 	}
 }

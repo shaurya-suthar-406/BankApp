@@ -33,9 +33,15 @@ public class MainApp {
 				acc.mpin=sc.next();
 				System.out.print("Enter Initial Balance : ");
 				acc.balance=sc.nextDouble();
+				acc.accountNumber=Account.nextAccountNumber;
+				Account.nextAccountNumber++;
 				accounts.add(acc);
 				System.out.println();
-				System.out.println("Account Created Successfully!");
+				System.out.println("Account Opened Successfully!");
+				System.out.println();
+				System.out.println("Account Number : "+acc.accountNumber);
+				System.out.println("Name : "+acc.name);
+				System.out.println("Current Balance : "+acc.balance);
 				System.out.println();
 				break;
 
@@ -46,14 +52,14 @@ public class MainApp {
 					System.out.println();
 					System.out.println("---------- LOGIN ----------");
 					System.out.println();
-					System.out.print("Enter Name : ");
-					String name=sc.next();
+					System.out.print("Enter A/c Number : ");
+					int accountNumber=sc.nextInt();
 					System.out.print("Enter MPIN : ");
 					String mpin=sc.next();
 					
 					Account loggedInUser = null;
 					for(Account a:accounts) {
-						if(a.name.equals(name)&&a.mpin.equals(mpin)) {
+						if(a.accountNumber == accountNumber && a.mpin.equals(mpin)) {
 							loggedInUser=a;
 							break;
 						}
@@ -69,8 +75,9 @@ public class MainApp {
 							System.out.println("1. Check Balance");
 							System.out.println("2. Deposit");
 							System.out.println("3. Withdraw");
-							System.out.println("4. View Transactions");
-							System.out.println("5. Logout");
+							System.out.println("4. Transfer Money");
+							System.out.println("5. View Transactions");
+							System.out.println("6. Logout");
 							System.out.println();
 							System.out.print("Enter Choice : ");
 							userChoice = sc.nextInt();
@@ -93,17 +100,39 @@ public class MainApp {
 								break;
 								
 							case 4:
-								loggedInUser.showTransactions();
+								System.out.print("Enter Reciever Account Number : ");
+								int receiverAccNo = sc.nextInt();
+								
+								Account receiver = null;
+								
+								for(Account a:accounts) {
+									if(a.accountNumber == receiverAccNo) {
+										receiver=a;
+										break;
+									}
+								}
+									if(receiver != null) {
+										System.out.print("Enter Amount To Transfer : ");
+										double trAmount=sc.nextDouble();
+										loggedInUser.transfer(receiver, trAmount);
+									}
+									else {
+										System.out.println("Receiver Account Not Found!");
+									}
 								break;
 								
 							case 5:
+								loggedInUser.showTransactions();
+								break;
+								
+							case 6:
 								System.out.println("Logging Out...");
 								System.out.println("Logged Out Successfully!");
 								break;
 							default:
 								System.out.println("Invalid Choice! Please Choose A Valid Number.");
 							}
-						} while(userChoice != 5);
+						} while(userChoice != 6);
 					}
 					else {
 						attempts++;
@@ -118,7 +147,7 @@ public class MainApp {
 				
 			case 3:
 				System.out.println("Exiting...");
-				System.out.println("* Thank You For Using Our Services *");
+				System.out.println("\n* Thank You For Using Our Services *");
 				System.out.println("\nHave A Nice Day :)");
 				break;
 				
