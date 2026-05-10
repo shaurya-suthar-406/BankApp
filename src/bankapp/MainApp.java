@@ -95,17 +95,23 @@ public class MainApp {
 								System.out.print("Enter Amount To Deposit : ");
 								double amount=sc.nextDouble();
 								loggedInUser.deposit(amount);
+								FileHandler.saveData(accounts);
 								break;
 								
 							case 3:
 								System.out.print("Enter Amount To Withdraw : ");
 								double withdrawAmount=sc.nextDouble();
 								loggedInUser.withdraw(withdrawAmount);
+								FileHandler.saveData(accounts);
 								break;
 								
 							case 4:
 								System.out.print("Enter Reciever Account Number : ");
 								int receiverAccNo = sc.nextInt();
+								if(receiverAccNo==loggedInUser.accountNumber) {
+									System.out.println("You Cannot Transfer Money To Your Own Account!");
+									break;
+								}
 								
 								Account receiver = null;
 								
@@ -119,6 +125,7 @@ public class MainApp {
 										System.out.print("Enter Amount To Transfer : ");
 										double trAmount=sc.nextDouble();
 										loggedInUser.transfer(receiver, trAmount);
+										FileHandler.saveData(accounts);
 									}
 									else {
 										System.out.println("Receiver Account Not Found!");

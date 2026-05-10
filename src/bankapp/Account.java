@@ -15,7 +15,7 @@ public class Account {
 	void deposit(double amount) {
 		if(amount > 0) {
 			balance += amount;
-			transactions.add("DEPOSIT +"+amount+" | Balance : "+balance);
+			transactions.add("DEPOSIT +"+amount);
 			System.out.println("Deposit Successful!");
 			System.out.println("Current Balance : "+balance);
 		}
@@ -27,7 +27,7 @@ public class Account {
 	boolean withdraw(double amount) {
 		if(amount>0 && amount<=balance) {
 			balance -= amount;
-			transactions.add("WITHDRAW -"+amount+" | Balance : "+balance);
+			transactions.add("WITHDRAW -"+amount);
 			System.out.println("Withdrawal Successful!");
 			System.out.println("Current Balance : "+balance);
 			return true;
@@ -60,8 +60,8 @@ public class Account {
 		if(amount>0 && amount<=balance) {
 			balance -= amount;
 			receiver.balance += amount;
-			transactions.add("TRANSFERRED -"+amount+" TO A/C "+receiver.accountNumber+" | Balance : "+balance);
-			receiver.transactions.add("RECEIVED +"+amount+" FROM A/C "+accountNumber+" | Balance : "+receiver.balance);
+			transactions.add("TRANSFERRED -"+amount+" TO A/C "+receiver.accountNumber);
+			receiver.transactions.add("RECEIVED +"+amount+" FROM A/C "+accountNumber);
 			System.out.println("Transfer Successful!");
 			System.out.println("\nTransferred Amount : "+amount);
 			System.out.println("Receiver Name : "+receiver.name);

@@ -13,11 +13,13 @@ public class FileHandler {
 		try {
 			FileWriter writer = new FileWriter("accounts.txt");
 			for(Account a:accounts) {
+				String allTransactions = String.join("|", a.transactions);
 				writer.write(
 						a.accountNumber+", "+
 						a.name+", "+
 						a.mpin+", "+
-						a.balance
+						a.balance+", "+
+						allTransactions
 				);
 				writer.write("\n");
 			}
@@ -39,6 +41,12 @@ public class FileHandler {
 				acc.name=parts[1];
 				acc.mpin=parts[2];
 				acc.balance=Double.parseDouble(parts[3]);
+				if(parts.length > 4) {
+					String[] txns = parts[4].split("\\|");
+					for(String t:txns) {
+						acc.transactions.add(t);
+					}
+				}
 				accounts.add(acc);
 				if(acc.accountNumber>=Account.nextAccountNumber) {
 					Account.nextAccountNumber = acc.accountNumber + 1;
