@@ -8,9 +8,12 @@ public class MainApp {
 	public static void main(String[] args) {
 		
 		ArrayList<Account> accounts = new ArrayList<>();
+		
+		FileHandler.loadData(accounts);
+		
 		Scanner sc=new Scanner(System.in);
 		int choice;
-		
+
 		System.out.println("--------------- BANK APP ---------------");
 		do {
 			System.out.println();
@@ -36,6 +39,7 @@ public class MainApp {
 				acc.accountNumber=Account.nextAccountNumber;
 				Account.nextAccountNumber++;
 				accounts.add(acc);
+				FileHandler.saveData(accounts);
 				System.out.println();
 				System.out.println("Account Opened Successfully!");
 				System.out.println();
