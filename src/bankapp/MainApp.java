@@ -81,7 +81,8 @@ public class MainApp {
 							System.out.println("3. Withdraw");
 							System.out.println("4. Transfer Money");
 							System.out.println("5. View Transactions");
-							System.out.println("6. Logout");
+							System.out.println("6. View Mini Statement");
+							System.out.println("7. Logout");
 							System.out.println();
 							System.out.print("Enter Choice : ");
 							userChoice = sc.nextInt();
@@ -137,13 +138,17 @@ public class MainApp {
 								break;
 								
 							case 6:
+								loggedInUser.showMiniStatement();
+								break;
+								
+							case 7:
 								System.out.println("Logging Out...");
 								System.out.println("Logged Out Successfully!");
 								break;
 							default:
 								System.out.println("Invalid Choice! Please Choose A Valid Number.");
 							}
-						} while(userChoice != 6);
+						} while(userChoice != 7);
 					}
 					else {
 						attempts++;

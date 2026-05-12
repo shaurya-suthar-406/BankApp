@@ -71,4 +71,12 @@ public class Account {
 			System.out.println("\nInsufficient Balance Or Invalid Amount!");
 		}
 	}
+	
+	void showMiniStatement() {
+		System.out.println("---------- MINI STATEMENT ----------");
+		for(int i=0;i<transactions.size();i++) {
+			System.out.println((i+1)+". "+transactions.get(i));
+		}
+		System.out.println("Current Balance : "+balance);
+	}
 }
