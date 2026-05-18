@@ -79,4 +79,21 @@ public class Account {
 		}
 		System.out.println("Current Balance : "+balance);
 	}
+	
+	void changeMPIN(String oldMPIN, String newMPIN) {
+		if(!mpin.equals(oldMPIN)) {
+			System.out.println("Old MPIN Is Incorrect!");
+		}
+		else if(oldMPIN.equals(newMPIN)) {
+			System.out.println("Your Old MPIN Cannot Be The New MPIN!");
+		}
+		else {
+			mpin=newMPIN;
+			System.out.println("MPIN Changed Successfully!");
+		}
+	}
+	
+	boolean isValidMPIN(String mpin) {
+		return mpin.matches("\\d{6}");
+	}
 }

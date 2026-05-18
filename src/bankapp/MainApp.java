@@ -33,7 +33,17 @@ public class MainApp {
 				System.out.print("Enter Your Name : ");
 				acc.name=sc.next();
 				System.out.print("Set MPIN : ");
-				acc.mpin=sc.next();
+				while(true) {
+					System.out.print("Set MPIN (6 Digits) : ");
+					String tempMPIN = sc.next();
+					if(acc.isValidMPIN(tempMPIN)) {
+						acc.mpin=tempMPIN;
+						break;
+					}
+					else {
+						System.out.println("Invalid MPIN! Enter Exactly 6 Digits.");
+					}
+				}
 				System.out.print("Enter Initial Balance : ");
 				acc.balance=sc.nextDouble();
 				acc.accountNumber=Account.nextAccountNumber;
@@ -82,7 +92,8 @@ public class MainApp {
 							System.out.println("4. Transfer Money");
 							System.out.println("5. View Transactions");
 							System.out.println("6. View Mini Statement");
-							System.out.println("7. Logout");
+							System.out.println("7. Change MPIN");
+							System.out.println("8. Logout");
 							System.out.println();
 							System.out.print("Enter Choice : ");
 							userChoice = sc.nextInt();
@@ -142,13 +153,38 @@ public class MainApp {
 								break;
 								
 							case 7:
+								System.out.print("Enter Old MPIN : ");
+								String oldMPIN = sc.next();
+								String newMPIN;
+								while(true) {
+									System.out.print("Enter New MPIN (6 Digits) : ");
+									newMPIN=sc.next();
+									if(loggedInUser.isValidMPIN(newMPIN)) {
+										break;
+									}
+									else {
+										System.out.println("Invalid MPIN! Enter Exactly 6 Digits.");
+									}
+								}
+								System.out.print("Confirm New MPIN : ");
+								String confirmMPIN = sc.next();
+								if(newMPIN.equals(confirmMPIN)) {
+									loggedInUser.changeMPIN(oldMPIN, newMPIN);
+									FileHandler.saveData(accounts);
+								}
+								else {
+									System.out.println("MPIN Confirmation Failed!");
+								}
+								break;
+								
+							case 8:
 								System.out.println("Logging Out...");
 								System.out.println("Logged Out Successfully!");
 								break;
 							default:
 								System.out.println("Invalid Choice! Please Choose A Valid Number.");
 							}
-						} while(userChoice != 7);
+						} while(userChoice != 8);
 					}
 					else {
 						attempts++;
