@@ -9,6 +9,7 @@ public class Account {
 	double balance;
 	int accountNumber;
 	static int nextAccountNumber=1001;
+	boolean isBlocked=false;
 	
 	ArrayList<String> transactions = new ArrayList<>();
 	
@@ -74,8 +75,9 @@ public class Account {
 	
 	void showMiniStatement() {
 		System.out.println("---------- MINI STATEMENT ----------");
-		for(int i=0;i<transactions.size();i++) {
-			System.out.println((i+1)+". "+transactions.get(i));
+		int start=Math.max(0,transactions.size()-5);
+		for(int i=start;i<transactions.size();i++){
+		 System.out.println((i+1)+". "+transactions.get(i));
 		}
 		System.out.println("Current Balance : "+balance);
 	}

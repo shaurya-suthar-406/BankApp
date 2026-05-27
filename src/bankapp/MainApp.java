@@ -6,13 +6,13 @@ import java.util.Scanner;
 public class MainApp {
 
 	public static void main(String[] args) {
-		
+
 		ArrayList<Account> accounts = new ArrayList<>();
-		
+
 		FileHandler.loadData(accounts);
-		
-		Scanner sc=new Scanner(System.in);
-		int choice;
+
+		Scanner sc = new Scanner(System.in);
+		String choice; // Changed from int to String for crash-proof menu input
 
 		System.out.println("--------------- BANK APP ---------------");
 		do {
@@ -22,194 +22,251 @@ public class MainApp {
 			System.out.println("3. Exit");
 			System.out.println();
 			System.out.print("Enter Number Corresponding To Your Choice : ");
-			choice=sc.nextInt();
-			
-			switch(choice) {
-			case 1:
+			choice = sc.next(); // Safely reads any input as a string
+
+			switch (choice) {
+			case "1": // Use string literals for menu options
 				System.out.println();
 				System.out.println("---------- SIGNUP ----------");
 				System.out.println();
-				Account acc=new Account();
+				Account acc = new Account();
 				System.out.print("Enter Your Name : ");
-				acc.name=sc.next();
-				System.out.print("Set MPIN : ");
-				while(true) {
+				sc.nextLine(); // Clear buffer
+				acc.name = sc.nextLine();
+				while (true) {
 					System.out.print("Set MPIN (6 Digits) : ");
 					String tempMPIN = sc.next();
-					if(acc.isValidMPIN(tempMPIN)) {
-						acc.mpin=tempMPIN;
+					if (acc.isValidMPIN(tempMPIN)) {
+						acc.mpin = tempMPIN;
 						break;
-					}
-					else {
+					} else {
 						System.out.println("Invalid MPIN! Enter Exactly 6 Digits.");
 					}
 				}
-				System.out.print("Enter Initial Balance : ");
-				acc.balance=sc.nextDouble();
-				acc.accountNumber=Account.nextAccountNumber;
+				
+				// Infinite loop with validation to handle invalid types for initial balance
+				while (true) {
+					System.out.print("Enter Initial Balance : ");
+					if (sc.hasNextDouble()) {
+						acc.balance = sc.nextDouble();
+						if (acc.balance >= 0) {
+							break;
+						}
+						System.out.println("Initial balance cannot be negative!");
+					} else {
+						System.out.println("Invalid Input! Please enter a valid number.");
+						sc.next(); // Clear the bad tokens out of scanner memory
+					}
+				}
+				
+				acc.accountNumber = Account.nextAccountNumber;
 				Account.nextAccountNumber++;
 				accounts.add(acc);
 				FileHandler.saveData(accounts);
 				System.out.println();
 				System.out.println("Account Opened Successfully!");
 				System.out.println();
-				System.out.println("Account Number : "+acc.accountNumber);
-				System.out.println("Name : "+acc.name);
-				System.out.println("Current Balance : "+acc.balance);
+				System.out.println("Account Number : " + acc.accountNumber);
+				System.out.println("Name : " + acc.name);
+				System.out.println("Current Balance : " + acc.balance);
 				System.out.println();
 				break;
 
-			case 2:
+			case "2":
+				System.out.println();
+				System.out.println("---------- LOGIN ----------");
+				System.out.println();
+				System.out.print("Enter A/c Number : ");
+				
+				// Validate account number token type
+				if (!sc.hasNextInt()) {
+					System.out.println("Invalid Account Number Format! Numbers only.");
+					sc.next(); // Clear bad token
+					break;
+				}
+				int accountNumber = sc.nextInt();
+
+				// Find the account first
+				Account targetedUser = null;
+				for (Account a : accounts) {
+					if (a.accountNumber == accountNumber) {
+						targetedUser = a;
+						break;
+					}
+				}
+
+				if (targetedUser == null) {
+					System.out.println("Account Number Not Found!");
+					break;
+				}
+
+				if (targetedUser.isBlocked) {
+					System.out.println(
+							"This account has been temporarily blocked due to multiple failed login attempts. Please contact support.");
+					break;
+				}
+
 				int attempts = 0;
 				boolean loggedIn = false;
-				while(attempts < 3 && !loggedIn) {
-					System.out.println();
-					System.out.println("---------- LOGIN ----------");
-					System.out.println();
-					System.out.print("Enter A/c Number : ");
-					int accountNumber=sc.nextInt();
-					System.out.print("Enter MPIN : ");
-					String mpin=sc.next();
-					
-					Account loggedInUser = null;
-					for(Account a:accounts) {
-						if(a.accountNumber == accountNumber && a.mpin.equals(mpin)) {
-							loggedInUser=a;
-							break;
+
+				while (attempts < 3) {
+					System.out.print("Enter MPIN for Account " + accountNumber + " (Attempts left: " + (3 - attempts) + "): ");
+					String mpin = sc.next();
+
+					if (targetedUser.mpin.equals(mpin)) {
+						loggedIn = true;
+						break; // Exit the login loop immediately on success
+					} else {
+						attempts++;
+						if (attempts < 3) {
+							System.out.println("The Credentials Are Invalid!");
 						}
 					}
-					
-					if(loggedInUser!=null) {
-						loggedIn = true;
-						int userChoice;
+				}
+
+				if (loggedIn) {
+					String userChoice; // Changed from int to String for crash-proof sub-menu input
+
+					do {
+						System.out.println();
+						System.out.println("---------- USER MENU ----------");
+						System.out.println("1. Check Balance");
+						System.out.println("2. Deposit");
+						System.out.println("3. Withdraw");
+						System.out.println("4. Transfer Money");
+						System.out.println("5. View Transactions");
+						System.out.println("6. View Mini Statement");
+						System.out.println("7. Change MPIN");
+						System.out.println("8. Logout");
+						System.out.println();
+						System.out.print("Enter Choice : ");
+						userChoice = sc.next();
+						System.out.println();
 						
-						do {
-							System.out.println();
-							System.out.println("---------- USER MENU ----------");
-							System.out.println("1. Check Balance");
-							System.out.println("2. Deposit");
-							System.out.println("3. Withdraw");
-							System.out.println("4. Transfer Money");
-							System.out.println("5. View Transactions");
-							System.out.println("6. View Mini Statement");
-							System.out.println("7. Change MPIN");
-							System.out.println("8. Logout");
-							System.out.println();
-							System.out.print("Enter Choice : ");
-							userChoice = sc.nextInt();
-							System.out.println();
-							switch(userChoice) {
-							case 1:
-								loggedInUser.showBalance();
-								break;
-								
-							case 2:
-								System.out.print("Enter Amount To Deposit : ");
-								double amount=sc.nextDouble();
-								loggedInUser.deposit(amount);
+						switch (userChoice) {
+						case "1":
+							targetedUser.showBalance();
+							break;
+
+						case "2":
+							System.out.print("Enter Amount To Deposit : ");
+							if (sc.hasNextDouble()) {
+								double amount = sc.nextDouble();
+								targetedUser.deposit(amount);
 								FileHandler.saveData(accounts);
-								break;
-								
-							case 3:
-								System.out.print("Enter Amount To Withdraw : ");
-								double withdrawAmount=sc.nextDouble();
-								loggedInUser.withdraw(withdrawAmount);
+							} else {
+								System.out.println("Invalid Amount Format!");
+								sc.next(); // Clear bad input
+							}
+							break;
+
+						case "3":
+							System.out.print("Enter Amount To Withdraw : ");
+							if (sc.hasNextDouble()) {
+								double withdrawAmount = sc.nextDouble();
+								targetedUser.withdraw(withdrawAmount);
 								FileHandler.saveData(accounts);
+							} else {
+								System.out.println("Invalid Amount Format!");
+								sc.next(); // Clear bad input
+							}
+							break;
+
+						case "4":
+							System.out.print("Enter Reciever Account Number : ");
+							if (!sc.hasNextInt()) {
+								System.out.println("Invalid Account Number Format!");
+								sc.next(); // Clear bad input
 								break;
-								
-							case 4:
-								System.out.print("Enter Reciever Account Number : ");
-								int receiverAccNo = sc.nextInt();
-								if(receiverAccNo==loggedInUser.accountNumber) {
-									System.out.println("You Cannot Transfer Money To Your Own Account!");
+							}
+							int receiverAccNo = sc.nextInt();
+							
+							if (receiverAccNo == targetedUser.accountNumber) {
+								System.out.println("You Cannot Transfer Money To Your Own Account!");
+								break;
+							}
+
+							Account receiver = null;
+							for (Account a : accounts) {
+								if (a.accountNumber == receiverAccNo) {
+									receiver = a;
 									break;
 								}
-								
-								Account receiver = null;
-								
-								for(Account a:accounts) {
-									if(a.accountNumber == receiverAccNo) {
-										receiver=a;
-										break;
-									}
-								}
-									if(receiver != null) {
-										System.out.print("Enter Amount To Transfer : ");
-										double trAmount=sc.nextDouble();
-										loggedInUser.transfer(receiver, trAmount);
-										FileHandler.saveData(accounts);
-									}
-									else {
-										System.out.println("Receiver Account Not Found!");
-									}
-								break;
-								
-							case 5:
-								loggedInUser.showTransactions();
-								break;
-								
-							case 6:
-								loggedInUser.showMiniStatement();
-								break;
-								
-							case 7:
-								System.out.print("Enter Old MPIN : ");
-								String oldMPIN = sc.next();
-								String newMPIN;
-								while(true) {
-									System.out.print("Enter New MPIN (6 Digits) : ");
-									newMPIN=sc.next();
-									if(loggedInUser.isValidMPIN(newMPIN)) {
-										break;
-									}
-									else {
-										System.out.println("Invalid MPIN! Enter Exactly 6 Digits.");
-									}
-								}
-								System.out.print("Confirm New MPIN : ");
-								String confirmMPIN = sc.next();
-								if(newMPIN.equals(confirmMPIN)) {
-									loggedInUser.changeMPIN(oldMPIN, newMPIN);
-									FileHandler.saveData(accounts);
-								}
-								else {
-									System.out.println("MPIN Confirmation Failed!");
-								}
-								break;
-								
-							case 8:
-								System.out.println("Logging Out...");
-								System.out.println("Logged Out Successfully!");
-								break;
-							default:
-								System.out.println("Invalid Choice! Please Choose A Valid Number.");
 							}
-						} while(userChoice != 8);
-					}
-					else {
-						attempts++;
-						System.out.println("The Credentials Are Invalid! You Have "+(3-attempts)+" Attempts Left.");
-					}
+							if (receiver != null) {
+								System.out.print("Enter Amount To Transfer : ");
+								if (sc.hasNextDouble()) {
+									double trAmount = sc.nextDouble();
+									targetedUser.transfer(receiver, trAmount);
+									FileHandler.saveData(accounts);
+								} else {
+									System.out.println("Invalid Transfer Amount Format!");
+									sc.next(); // Clear bad input
+								}
+							} else {
+								System.out.println("Receiver Account Not Found!");
+							}
+							break;
+
+						case "5":
+							targetedUser.showTransactions();
+							break;
+
+						case "6":
+							targetedUser.showMiniStatement();
+							break;
+
+						case "7":
+							System.out.print("Enter Old MPIN : ");
+							String oldMPIN = sc.next();
+							String newMPIN;
+							while (true) {
+								System.out.print("Enter New MPIN (6 Digits) : ");
+								newMPIN = sc.next();
+								if (targetedUser.isValidMPIN(newMPIN)) {
+									break;
+								} else {
+									System.out.println("Invalid MPIN! Enter Exactly 6 Digits.");
+								}
+							}
+							System.out.print("Confirm New MPIN : ");
+							String confirmMPIN = sc.next();
+							if (newMPIN.equals(confirmMPIN)) {
+								targetedUser.changeMPIN(oldMPIN, newMPIN);
+								FileHandler.saveData(accounts);
+							} else {
+								System.out.println("MPIN Confirmation Failed!");
+							}
+							break;
+
+						case "8":
+							System.out.println("Logging Out...");
+							System.out.println("Logged Out Successfully!");
+							break;
+						default:
+							System.out.println("Invalid Choice! Please Choose A Valid Number.");
+						}
+					} while (!userChoice.equals("8"));
+					
+				} else if (attempts == 3) { // Triggers block ONLY if max failed entry attempts hit
+					targetedUser.isBlocked = true; 
+					FileHandler.saveData(accounts); 
+					System.out.println("Access To The Account Has Been Temporarily Blocked Due To 3 Failed Login Attempts. Please Contact Support!");
 				}
-				if(!loggedIn) {
-					System.out.println("Access To The Account Has Been Temporarily Blocked Due To Multiple Failed Login Attempts. Please Try Again Later!");
-				}
-				
 				break;
-				
-			case 3:
+
+			case "3":
 				System.out.println("Exiting...");
 				System.out.println("\n* Thank You For Using Our Services *");
 				System.out.println("\nHave A Nice Day :)");
 				break;
-				
+
 			default:
 				System.out.println("Invalid Choice! Please Choose A Valid Number.");
 				break;
 			}
-		} while(choice!=3);
-		
+		} while (!choice.equals("3"));
+
 		sc.close();
 	}
-
 }
