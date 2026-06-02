@@ -150,27 +150,36 @@ public class MainApp {
 
 						case "2":
 							System.out.print("Enter Amount To Deposit : ");
-							if (sc.hasNextDouble()) {
-								double amount = sc.nextDouble();
-								targetedUser.deposit(amount);
-								FileHandler.saveData(accounts);
+							Integer amount=sc.nextInt();
+							if (targetedUser.deposit(amount)) {
+							    System.out.println("Deposit Successful!");
+							    System.out.println("Current Balance : " + targetedUser.balance);
+							    FileHandler.saveData(accounts);
 							} else {
-								System.out.println("Invalid Amount Format!");
-								sc.next(); // Clear bad input
+							    System.out.println("Please Enter A Valid Amount For Deposit!");
 							}
 							break;
 
 						case "3":
-							System.out.print("Enter Amount To Withdraw : ");
-							if (sc.hasNextDouble()) {
-								double withdrawAmount = sc.nextDouble();
-								targetedUser.withdraw(withdrawAmount);
-								FileHandler.saveData(accounts);
-							} else {
-								System.out.println("Invalid Amount Format!");
-								sc.next(); // Clear bad input
-							}
-							break;
+						    System.out.print("Enter Amount To Withdraw : ");
+						    if (sc.hasNextDouble()) {
+						        double withdrawAmount = sc.nextDouble();
+						        
+						        // Call the method and check if it returned true or false
+						        if (targetedUser.withdraw(withdrawAmount)) {
+						            System.out.println("Withdrawal Successful!");
+						            System.out.println("Current Balance : " + targetedUser.balance);
+						            
+						            // Save data to the text file since the balance changed successfully
+						            FileHandler.saveData(accounts);
+						        } else {
+						            System.out.println("Withdrawal Failed! Insufficient Balance Or Invalid Amount.");
+						        }
+						    } else {
+						        System.out.println("Invalid Amount Format!");
+						        sc.next(); // Clear the invalid input buffer
+						    }
+						    break;
 
 						case "4":
 							System.out.print("Enter Reciever Account Number : ");
@@ -197,13 +206,27 @@ public class MainApp {
 								System.out.print("Enter Amount To Transfer : ");
 								if (sc.hasNextDouble()) {
 									double trAmount = sc.nextDouble();
-									targetedUser.transfer(receiver, trAmount);
-									FileHandler.saveData(accounts);
-								} else {
-									System.out.println("Invalid Transfer Amount Format!");
-									sc.next(); // Clear bad input
+									String status = targetedUser.transfer(receiver, trAmount);
+									if(status.equals("INVALID_AMOUNT")) {
+										System.out.println("Invalid Amount! Please Enter A Valid Amount!");
+									}
+									else if(status.equals("INSUFFICIENT_BALANCE")) {
+										System.out.println("Transfer Failed! You Do Not Have Sufficient Balance!");
+									}
+									else if(status.equals("SUCCESS")) {
+										System.out.println("Transfer Successful!");
+										System.out.println("\nTransferred Amount : "+trAmount);
+										System.out.println("Receiver Name : "+receiver.name);
+										System.out.println("\nCurrent Balance : "+targetedUser.balance);
+										FileHandler.saveData(accounts);
+									}
 								}
-							} else {
+								else {
+									System.out.println("Invalid Transfer Amount Format!");
+									sc.next();
+								}
+							}
+							else {
 								System.out.println("Receiver Account Not Found!");
 							}
 							break;
