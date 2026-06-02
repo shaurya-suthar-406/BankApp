@@ -57,11 +57,13 @@ public class Account {
 		if(amount <= 0) {
 			return "INVALID_AMOUNT";
 		}
+		
 		if(amount > balance) {
 			return "INSUFFICIENT_BALANCE";
 		}
-		this.withdraw(amount);
-		receiver.deposit(amount);
+		
+		this.balance -= amount;
+		receiver.balance += amount;
 		
 		transactions.add("TRANSFERRED -"+amount+" TO A/C NO. "+receiver.accountNumber);
 		receiver.transactions.add("RECEIVED +"+amount+" FROM A/C NO. "+accountNumber);
