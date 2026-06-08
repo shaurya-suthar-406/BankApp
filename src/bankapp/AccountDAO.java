@@ -63,4 +63,22 @@ public class AccountDAO {
         
         return null; // Return null if no account matched or if an error occurred
     }
+    
+    public static int getNextAccountNumber() {
+        String sql = "SELECT MAX(account_number) FROM accounts";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             java.sql.ResultSet rs = pstmt.executeQuery()) {
+            
+            if (rs.next()) {
+                int maxId = rs.getInt(1);
+                if (maxId > 0) {
+                    return maxId + 1; // Next number is highest + 1
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching next account number: " + e.getMessage());
+        }
+        return 1001; // Default fallback if table is empty
+    }
 }
