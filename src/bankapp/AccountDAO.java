@@ -64,6 +64,44 @@ public class AccountDAO {
         return null; // Return null if no account matched or if an error occurred
     }
     
+    public static Account getAccount(int accNumber) {
+    	String sql = "SELECT * FROM accounts WHERE account_number = ?";
+    	try(Connection conn = DatabaseConnection.getConnection();
+    			PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    		pstmt.setInt(1, accNumber);
+    		try(java.sql.ResultSet rs = pstmt.executeQuery()) {
+    			if(rs.next()) {
+    				Account acc = new Account();
+    				acc.accountNumber = rs.getInt("account_number");
+    				acc.name = rs.getString("name");
+    				acc.balance = rs.getDouble("balance");
+    				acc.mpin = rs.getString("password");
+    				return acc;
+    			}
+    		}
+    	} catch (SQLException e) {
+    		System.out.println("Error fetching receiver Account: "+e.getMessage());
+    	}
+    	return null;
+    }
+    
+    public static boolean updateBalance(int accNumber, double newBalance) {
+    	String sql = "UPDATE accounts SET balance = ? WHERE account_number = ?";
+    	try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)){
+        	pstmt.setInt(2, accNumber);
+        	pstmt.setDouble(1, newBalance);
+        	
+        	int rowsAffected = pstmt.executeUpdate();
+        	
+        	return rowsAffected > 0;
+    	}
+        catch (SQLException e) {
+    		System.out.println("Error updating balance: " + e.getMessage());
+    	}
+    return false;
+    }
+    
     public static int getNextAccountNumber() {
         String sql = "SELECT MAX(account_number) FROM accounts";
         try (Connection conn = DatabaseConnection.getConnection();

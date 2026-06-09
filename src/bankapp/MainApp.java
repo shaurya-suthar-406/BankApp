@@ -9,8 +9,6 @@ public class MainApp {
 
 		ArrayList<Account> accounts = new ArrayList<>();
 
-		FileHandler.loadData(accounts);
-
 		Scanner sc = new Scanner(System.in);
 		String choice; // Changed from int to String for crash-proof menu input
 
@@ -133,32 +131,38 @@ public class MainApp {
 						break;
 
 					case "2":
-						System.out.print("Enter Amount To Deposit : ");
-						Integer amount = sc.nextInt();
-						if (targetedUser.deposit(amount)) {
-						    System.out.println("Deposit Successful!");
-						    System.out.println("Current Balance : " + targetedUser.balance);
-						    FileHandler.saveData(accounts);
-						} else {
-						    System.out.println("Please Enter A Valid Amount For Deposit!");
-						}
-						break;
+					    System.out.print("Enter Amount To Deposit : ");
+					    Double amount = sc.nextDouble();
+					    
+					    if (targetedUser.deposit(amount)) {
+					        boolean dbUpdated = AccountDAO.updateBalance(targetedUser.accountNumber, targetedUser.balance);
+					        
+					        if (dbUpdated) {
+					            System.out.println("Deposit Successful and saved to Database! 🎉");
+					            System.out.println("Current Balance : " + targetedUser.balance);
+					        } else {
+					            System.out.println("Database sync failed! Balance updated in memory only.");
+					        }
+					    } else {
+					        System.out.println("Please Enter A Valid Amount For Deposit!");
+					    }
+					    break;
 
 					case "3":
 					    System.out.print("Enter Amount To Withdraw : ");
-					    if (sc.hasNextDouble()) {
-					        double withdrawAmount = sc.nextDouble();
-					        
-					        if (targetedUser.withdraw(withdrawAmount)) {
-					            System.out.println("Withdrawal Successful!");
-					            System.out.println("Current Balance : " + targetedUser.balance);
-					            FileHandler.saveData(accounts);
-					        } else {
-					            System.out.println("Withdrawal Failed! Insufficient Balance Or Invalid Amount.");
-					        }
+					    Double wAmount = sc.nextDouble();
+					    
+					    if(targetedUser.withdraw(wAmount)) {
+					    	boolean dbUpdated = AccountDAO.updateBalance(targetedUser.accountNumber, targetedUser.balance);
+					    	
+					    	if(dbUpdated) {
+					    		System.out.println("Withdrawal Successful! Saved to Database! 🎉");
+					    		System.out.println("Current Balance : " + targetedUser.balance);
+					    	} else {
+					    		System.out.println("Database sync failed! Balance updated in memory only.");
+					    	}
 					    } else {
-					        System.out.println("Invalid Amount Format!");
-					        sc.next(); 
+					    	System.out.println("Please Enter A Valid Amount For Withdrawal!");
 					    }
 					    break;
 
@@ -176,13 +180,8 @@ public class MainApp {
 							break;
 						}
 
-						Account receiver = null;
-						for (Account a : accounts) {
-							if (a.accountNumber == receiverAccNo) {
-								receiver = a;
-								break;
-							}
-						}
+						Account receiver = AccountDAO.getAccount(receiverAccNo);
+						
 						if (receiver != null) {
 							System.out.print("Enter Amount To Transfer : ");
 							if (sc.hasNextDouble()) {
@@ -195,11 +194,14 @@ public class MainApp {
 									System.out.println("Transfer Failed! You Do Not Have Sufficient Balance!");
 								}
 								else if(status.equals("SUCCESS")) {
-									System.out.println("Transfer Successful!");
-									System.out.println("\nTransferred Amount : " + trAmount);
-									System.out.println("Receiver Name : " + receiver.name);
-									System.out.println("\nCurrent Balance : " + targetedUser.balance);
-									FileHandler.saveData(accounts);
+									boolean senderUpdated = AccountDAO.updateBalance(targetedUser.accountNumber	, targetedUser.balance);
+									boolean receiverUpdated = AccountDAO.updateBalance(receiver.accountNumber, receiver.balance);
+									
+									if(senderUpdated && receiverUpdated) {
+										System.out.println("Transfer Successful! Both Accounts Updated in Database! 🎉");
+									} else {
+										System.out.println("Critical Error: Databse Sync Failed for One or Both Accounts!");
+									}
 								}
 							}
 							else {
