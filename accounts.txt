@@ -1,2 +1,0 @@
-1001,Shaurya Suthar,242009,10000.0,false,
-1002,Jil Suthar,192019,10000.0,false,

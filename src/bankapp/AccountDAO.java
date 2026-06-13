@@ -3,6 +3,7 @@ package bankapp;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class AccountDAO {
 
@@ -118,5 +119,51 @@ public class AccountDAO {
             System.out.println("Error fetching next account number: " + e.getMessage());
         }
         return 1001; // Default fallback if table is empty
+    }
+    
+    public static boolean logTransaction(int accNumber, String desc) {
+    	String sql = "INSERT INTO transactions (account_number, description) VALUES (?,?)";
+    	try (Connection conn = DatabaseConnection.getConnection();
+    			PreparedStatement pstmt = conn.prepareStatement(sql);){
+    		pstmt.setInt(1, accNumber);
+    		pstmt.setString(2, desc);
+    		int rowsInserted = pstmt.executeUpdate();
+    		return rowsInserted > 0;
+    	} catch (Exception e) {
+			System.out.println("Error Logging The Transaction: " + e.getMessage());
+			return false;
+		}
+    }
+    
+    public static ArrayList<String> getTransactionHistory(int accNumber){
+    	ArrayList<String> list = new ArrayList<>();
+    	String sql = "SELECT description FROM transactions WHERE account_number=? ORDER BY transaction_id ASC";
+    	try (Connection conn = DatabaseConnection.getConnection();
+    			PreparedStatement pstmt = conn.prepareStatement(sql);){
+			pstmt.setInt(1, accNumber);
+			try(java.sql.ResultSet rs = pstmt.executeQuery()){
+				while(rs.next()) {
+					String desc = rs.getString("description");
+					list.add(desc);
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("Error fetching Transaction History: "+e.getMessage());
+		}
+    	return list;
+    }
+    
+    public static boolean updateMPIN(int accNumber, String newMpin) {
+    	String sql = "UPDATE accounts SET password = ? WHERE account_number = ?";
+    	try(Connection conn = DatabaseConnection.getConnection();
+    			PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setString(1, newMpin);
+			pstmt.setInt(2, accNumber);
+			int rowsAffected = pstmt.executeUpdate();
+			return rowsAffected > 0;
+		} catch (SQLException e) {
+			System.out.println("Error updating MPIN in Database: "+e.getMessage());
+			return false;
+		}
     }
 }

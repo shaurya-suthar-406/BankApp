@@ -7,8 +7,6 @@ public class MainApp {
 
 	public static void main(String[] args) {
 
-		ArrayList<Account> accounts = new ArrayList<>();
-
 		Scanner sc = new Scanner(System.in);
 		String choice; // Changed from int to String for crash-proof menu input
 
@@ -60,8 +58,6 @@ public class MainApp {
                 acc.accountNumber = AccountDAO.getNextAccountNumber(); 
                 
                 if (AccountDAO.saveAccount(acc)) {
-                    accounts.add(acc); // Keeps temporary compatibility with inner features
-                    FileHandler.saveData(accounts); // Sync backup
                     System.out.println();
                     System.out.println("Account Opened Successfully and Saved to DB! 🎉");
                     System.out.println();
@@ -138,6 +134,9 @@ public class MainApp {
 					        boolean dbUpdated = AccountDAO.updateBalance(targetedUser.accountNumber, targetedUser.balance);
 					        
 					        if (dbUpdated) {
+					        	String txnDesc = "DEPOSIT +"+amount;
+					        	AccountDAO.logTransaction(targetedUser.accountNumber, txnDesc);
+					        	
 					            System.out.println("Deposit Successful and saved to Database! 🎉");
 					            System.out.println("Current Balance : " + targetedUser.balance);
 					        } else {
@@ -156,6 +155,9 @@ public class MainApp {
 					    	boolean dbUpdated = AccountDAO.updateBalance(targetedUser.accountNumber, targetedUser.balance);
 					    	
 					    	if(dbUpdated) {
+					    		String txnDesc = "WITHDRAW -"+wAmount;
+					    		AccountDAO.logTransaction(targetedUser.accountNumber, txnDesc);
+					    		
 					    		System.out.println("Withdrawal Successful! Saved to Database! 🎉");
 					    		System.out.println("Current Balance : " + targetedUser.balance);
 					    	} else {
@@ -198,6 +200,11 @@ public class MainApp {
 									boolean receiverUpdated = AccountDAO.updateBalance(receiver.accountNumber, receiver.balance);
 									
 									if(senderUpdated && receiverUpdated) {
+										String txnDesc="TRANSFERRED -"+trAmount+" TO ACCOUNT NUMBER "+receiver.accountNumber;
+										AccountDAO.logTransaction(targetedUser.accountNumber, txnDesc);
+										String recDesc="RECEIVED +"+trAmount+" FROM ACCOUNT NUMBER "+targetedUser.accountNumber;
+										AccountDAO.logTransaction(receiver.accountNumber, recDesc);
+										
 										System.out.println("Transfer Successful! Both Accounts Updated in Database! 🎉");
 									} else {
 										System.out.println("Critical Error: Databse Sync Failed for One or Both Accounts!");
@@ -215,11 +222,13 @@ public class MainApp {
 						break;
 
 					case "5":
-						targetedUser.showTransactions();
+						java.util.ArrayList<String> fullHistory = AccountDAO.getTransactionHistory(targetedUser.accountNumber);
+						targetedUser.showTransactions(fullHistory);
 						break;
 
 					case "6":
-						targetedUser.showMiniStatement();
+						java.util.ArrayList<String> miniHistory = AccountDAO.getTransactionHistory(targetedUser.accountNumber);
+						targetedUser.showMiniStatement(miniHistory);
 						break;
 
 					case "7":
@@ -238,8 +247,18 @@ public class MainApp {
 						System.out.print("Confirm New MPIN : ");
 						String confirmMPIN = sc.next();
 						if (newMPIN.equals(confirmMPIN)) {
-							targetedUser.changeMPIN(oldMPIN, newMPIN);
-							FileHandler.saveData(accounts);
+							if(targetedUser.mpin.equals(oldMPIN) && !oldMPIN.equals(newMPIN)) {
+								targetedUser.changeMPIN(oldMPIN, newMPIN);
+								
+								boolean mpinUpdated = AccountDAO.updateMPIN(targetedUser.accountNumber, newMPIN);
+								if(mpinUpdated) {
+									System.out.println("Database Sync Complete! New MPIN is Permanent!");
+								} else {
+									System.out.println("Database Sync Failed!");
+								}
+							} else {
+								targetedUser.changeMPIN(oldMPIN, newMPIN);
+							}
 						} else {
 							System.out.println("MPIN Confirmation Failed!");
 						}
