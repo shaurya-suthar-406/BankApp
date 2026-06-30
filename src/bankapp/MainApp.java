@@ -84,26 +84,49 @@ public class MainApp {
 				}
 				int accountNumber = sc.nextInt();
 
-				System.out.print("Enter MPIN: ");
-				String mpinInput = sc.next();
-
-				// DATABASE MIGRATION: Fetch authenticated user row directly via SQL
-				Account targetedUser = AccountDAO.getAccount(accountNumber, mpinInput);
+				// 1. Fetch the user by Account Number FIRST (before asking for MPIN)
+				Account targetedUser = AccountDAO.getAccount(accountNumber);
 
 				if (targetedUser == null) {
-					System.out.println("Invalid Account Number or MPIN! Login Failed.");
-					break;
+					System.out.println("Account Not Found!");
+					break; // Kick back to main menu
 				}
 
+				// 2. Check if they are already blocked before letting them type an MPIN
 				if (targetedUser.isBlocked) {
-					System.out.println(
-							"This account has been temporarily blocked due to multiple failed login attempts. Please contact support.");
-					break;
+					System.out.println("This account has been temporarily blocked due to multiple failed login attempts. Please contact support.");
+					break; // Kick back to main menu
 				}
 
-				// If the database returns a valid object, credentials match perfectly!
+				// 3. The 3-Strike MPIN Loop
+				int attempts = 0;
+				boolean loginSuccess = false;
+
+				while (attempts < 3) {
+					System.out.print("Enter MPIN: ");
+					String mpinInput = sc.next();
+
+					if (targetedUser.mpin.equals(mpinInput)) {
+						loginSuccess = true;
+						break; // MPIN is correct, break out of the attempts loop!
+					} else {
+						attempts++;
+						System.out.println("Invalid MPIN! Attempts remaining: " + (3 - attempts));
+					}
+				}
+
+				// 4. If they failed 3 times, lock the account
+				if (!loginSuccess) {
+					System.out.println("Maximum attempts reached. Your account is now BLOCKED!");
+					AccountDAO.blockAccount(accountNumber);
+					break; // Kick back to main menu
+				}
+
+				// If we made it here, loginSuccess is true!
 				System.out.println("Login Successful! Welcome back, " + targetedUser.name + ".");
 				String userChoice; 
+				
+				// ... (The rest of your do-while userChoice loop stays exactly the same!)
 
 				do {
 					System.out.println();

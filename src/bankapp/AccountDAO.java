@@ -53,6 +53,7 @@ public class AccountDAO {
                     acc.name = rs.getString("name");
                     acc.balance = rs.getDouble("balance");
                     acc.mpin = rs.getString("password");
+                    acc.isBlocked = rs.getBoolean("is_blocked");
                     
                     return acc; // Return the fully populated account object
                 }
@@ -77,6 +78,7 @@ public class AccountDAO {
     				acc.name = rs.getString("name");
     				acc.balance = rs.getDouble("balance");
     				acc.mpin = rs.getString("password");
+    				acc.isBlocked = rs.getBoolean("is_blocked");
     				return acc;
     			}
     		}
@@ -165,5 +167,18 @@ public class AccountDAO {
 			System.out.println("Error updating MPIN in Database: "+e.getMessage());
 			return false;
 		}
+    }
+    
+    public static boolean blockAccount (int accNumber) {
+    	String sql = "UPDATE accounts SET is_blocked = true WHERE account_number = ?";
+    	try (Connection conn = DatabaseConnection.getConnection();
+    			PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    		pstmt.setInt(1, accNumber);
+    		int rowsAffected = pstmt.executeUpdate();
+    		return rowsAffected > 0;
+    	} catch (SQLException e) {
+    		System.out.println("Error Blocking Account: "+e.getMessage());
+    		return false;
+    	}
     }
 }
