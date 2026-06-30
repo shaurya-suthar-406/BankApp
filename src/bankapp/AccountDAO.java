@@ -139,18 +139,32 @@ public class AccountDAO {
     
     public static ArrayList<String> getTransactionHistory(int accNumber){
     	ArrayList<String> list = new ArrayList<>();
-    	String sql = "SELECT description FROM transactions WHERE account_number=? ORDER BY transaction_id ASC";
+        
+    	// DATABASE UPGRADE: Select the new timestamp column alongside the description
+    	String sql = "SELECT description, transaction_date FROM transactions WHERE account_number=? ORDER BY transaction_id ASC";
+        
     	try (Connection conn = DatabaseConnection.getConnection();
-    			PreparedStatement pstmt = conn.prepareStatement(sql);){
+    			PreparedStatement pstmt = conn.prepareStatement(sql)){
+    		
 			pstmt.setInt(1, accNumber);
+            
 			try(java.sql.ResultSet rs = pstmt.executeQuery()){
+                // Create a formatter to make the date look professional (e.g., 30-Jun-2026 01:15 PM)
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MMM-yyyy hh:mm a");
+                
 				while(rs.next()) {
 					String desc = rs.getString("description");
-					list.add(desc);
+                    java.sql.Timestamp ts = rs.getTimestamp("transaction_date");
+                    
+                    // Format the timestamp, handling potential nulls for old rows
+                    String timeString = (ts != null) ? sdf.format(ts) : "Unknown Date";
+                    
+                    // Append the timestamp to the end of the description string
+					list.add(desc + "  |  [" + timeString + "]");
 				}
 			}
 		} catch (Exception e) {
-			System.out.println("Error fetching Transaction History: "+e.getMessage());
+			System.out.println("Error fetching Transaction History: " + e.getMessage());
 		}
     	return list;
     }
