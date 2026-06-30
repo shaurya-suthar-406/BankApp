@@ -16,6 +16,7 @@ public class MainApp {
 			System.out.println("1. Signup");
 			System.out.println("2. Login");
 			System.out.println("3. Exit");
+			System.out.println("4. Admin Panel");
 			System.out.println();
 			System.out.print("Enter Number Corresponding To Your Choice : ");
 			choice = sc.next(); // Safely reads any input as a string
@@ -302,7 +303,34 @@ public class MainApp {
 				System.out.println("\n* Thank You For Using Our Services *");
 				System.out.println("\nHave A Nice Day :)");
 				break;
-
+				
+			case "4":
+				System.out.println();
+				System.out.println("---------- ADMIN PANEL ----------");
+				System.out.print("Enter Admin System PIN : ");
+				String adminPin = sc.next();
+				if(adminPin.equals("9999")) {
+					System.out.println("Admin Access Granted!");
+					System.out.print("Enter Account Number to Unblock : ");
+					if(sc.hasNextInt()) {
+						int unblockAcc = sc.nextInt();
+						if(AccountDAO.unblockAccount(unblockAcc)) {
+							System.out.println("Success! Account "+unblockAcc+" Has Been UNBLOCKED.");
+						}
+						else {
+							System.out.println("Failed! Account Not Found Or It Is Already Active.");
+						}
+					}
+					else {
+						System.out.println("Invalid Account Number Format!");
+						sc.next();
+					}
+				}
+				else {
+					System.out.println("SECURITY ALERT: Invalid Admin PIN! Access Denied.");
+				}
+				break;
+				
 			default:
 				System.out.println("Invalid Choice! Please Choose A Valid Number.");
 				break;

@@ -181,4 +181,17 @@ public class AccountDAO {
     		return false;
     	}
     }
+    
+    public static boolean unblockAccount (int accNumber) {
+    	String sql = "UPDATE accounts SET is_blocked = false WHERE account_number = ?";
+    	try (Connection conn = DatabaseConnection.getConnection();
+    			PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setInt(1, accNumber);
+			int rowsAffected = pstmt.executeUpdate();
+			return rowsAffected > 0;
+		} catch (Exception e) {
+			System.out.println("Error Unblocking Account: "+e.getMessage());
+			return false;
+		}
+    }
 }
